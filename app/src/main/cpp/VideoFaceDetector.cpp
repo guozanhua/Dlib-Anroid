@@ -1,11 +1,13 @@
-#include "include/VideoFaceDetector.h"
-#include "include/opencv/cv.hpp"
-#include "include/opencv2/core/core_c.h"
+#include "VideoFaceDetector.h"
 #include <iostream>
-#include <include/opencv2/imgproc.hpp>
+#include <assert.h>
 
 const double VideoFaceDetector::TICK_FREQUENCY = cv::getTickFrequency();
 
+VideoFaceDetector::VideoFaceDetector(const std::string cascadeFilePath)
+{
+    setFaceCascade(cascadeFilePath);
+}
 VideoFaceDetector::VideoFaceDetector(const std::string cascadeFilePath, cv::VideoCapture &videoCapture)
 {
     setFaceCascade(cascadeFilePath);
@@ -274,12 +276,19 @@ cv::Point VideoFaceDetector::getFrameAndDetect(cv::Mat &frame)
 {
     *m_videoCapture >> frame;
 
+    return getDetect(frame);
+}
+
+cv::Point VideoFaceDetector::getDetect(cv::Mat &frame)
+{
+
     // Downscale frame to m_resizedWidth width - keep aspect ratio
     m_scale = (double) std::min(m_resizedWidth, frame.cols) / frame.cols;
     cv::Size resizedFrameSize = cv::Size((int)(m_scale*frame.cols), (int)(m_scale*frame.rows));
 
     cv::Mat resizedFrame;
     cv::resize(frame, resizedFrame, resizedFrameSize);
+
 
     if (!m_foundFace)
         detectFaceAllSizes(resizedFrame); // Detect using cascades over whole image

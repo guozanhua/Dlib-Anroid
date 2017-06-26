@@ -4,15 +4,19 @@
 #include <opencv2/objdetect/objdetect.hpp>
 #include <string>
 #include <vector>
+#include <opencv/cv.hpp>
 #include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgproc.hpp>
 
 class VideoFaceDetector
 {
 public:
+    VideoFaceDetector(const std::string cascadeFilePath);
     VideoFaceDetector(const std::string cascadeFilePath, cv::VideoCapture &videoCapture);
     ~VideoFaceDetector();
 
     cv::Point               getFrameAndDetect(cv::Mat &frame);
+    cv::Point               getDetect(cv::Mat &frame);
     cv::Point               operator>>(cv::Mat &frame);
     void                    setVideoCapture(cv::VideoCapture &videoCapture);
     cv::VideoCapture*       videoCapture() const;

@@ -2,7 +2,7 @@
 # documentation: https://d.android.com/studio/projects/add-native-code.html
 cmake_minimum_required(VERSION 3.4.1)
 
-add_subdirectory(src/main/cpp/dlib)
+#add_subdirectory(src/main/cpp/dlib)
 
 add_library(native-lib SHARED src/main/cpp/native-lib.cpp src/main/cpp/VideoFaceDetector.cpp)
 
@@ -16,4 +16,4 @@ set_target_properties(opencv
                       PROPERTIES IMPORTED_LOCATION
                       ${CMAKE_SOURCE_DIR}/src/main/jniLibs/${ANDROID_ABI}/libopencv_java3.so)
 
-target_link_libraries(native-lib dlib opencv ${log-lib} )
+target_link_libraries(native-lib opencv ${log-lib} )

@@ -23,12 +23,12 @@ public class MainActivity extends AppCompatActivity {
 
         TextView tv = (TextView) findViewById(R.id.sample_text);
         long start = System.currentTimeMillis();
-        loadJpeg(ROOT + "/lena.jpg");
+        loadJpeg(ROOT, ROOT + "/lena.jpg");
         Log.w(TAG, "SPEND :" + (System.currentTimeMillis() - start));
         tv.setText(stringFromJNI());
     }
 
     public native String stringFromJNI();
 
-    public native void loadJpeg(String path);
+    public native void loadJpeg(String root, String path);
 }

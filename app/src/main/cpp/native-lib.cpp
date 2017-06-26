@@ -1,14 +1,13 @@
 #include <jni.h>
 #include <string>
-#include "dlib/image_processing/frontal_face_detector.h"
-#include "dlib/image_io.h"
 #include <android/log.h>
-#include <include/opencv2/core.hpp>
+#include <opencv2/core.hpp>
+#include <include/opencv/cv.hpp>
+#include "VideoFaceDetector.h"
 
 #define LOGW(...)  __android_log_print(ANDROID_LOG_WARN,"native-lib",__VA_ARGS__)
-using namespace dlib;
-using namespace cv;
 
+const cv::String CASCADE_FILE("haarcascade_frontalface_default.xml");
 extern "C"
 JNIEXPORT jstring JNICALL
 Java_com_orange_opencv_MainActivity_stringFromJNI(JNIEnv *env, jobject) {
@@ -18,19 +17,34 @@ Java_com_orange_opencv_MainActivity_stringFromJNI(JNIEnv *env, jobject) {
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_orange_opencv_MainActivity_loadJpeg(JNIEnv *env, jobject instance, jstring path_) {
+Java_com_orange_opencv_MainActivity_loadJpeg(JNIEnv *env, jobject instance, jstring root_,
+                                             jstring path_) {
     clock_t start, finish;
     start = clock();
+    const char *root = env->GetStringUTFChars(root_, NULL);
     const char *path = env->GetStringUTFChars(path_, NULL);
-    frontal_face_detector detector = get_frontal_face_detector();
-    array2d<unsigned char> img;
-    load_image(img, path);
-    pyramid_up(img);
+    std::string rootStr = root;
+    rootStr = rootStr + "/" + CASCADE_FILE;
 
-    std::vector<rectangle> dets = detector(img,0);
+
+    VideoFaceDetector detector(rootStr);
+
+    cv::Mat_<unsigned char> img(cv::imread(path, CV_LOAD_IMAGE_GRAYSCALE));
+
+    detector.getDetect(img);
+
+    if (detector.isFaceFound()) {
+        cv::Rect face_rect = detector.face();
+        LOGW("RECT X: %d", face_rect.x);
+        LOGW("RECT Y: %d", face_rect.y);
+        LOGW("RECT WIDTH: %d", face_rect.width);
+        LOGW("RECT HEIGHT: %d", face_rect.height);
+    }
+
     finish = clock();
-    LOGW(" spend = %d", ((finish - start)/ CLOCKS_PER_SEC));
+    long x = finish - start;
+    LOGW(" spend = %ld", x);
+    env->ReleaseStringUTFChars(root_, root);
     env->ReleaseStringUTFChars(path_, path);
-    LOGW(" dets size = %d", dets.size());
 
 }
